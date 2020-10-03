@@ -39,7 +39,11 @@ exports.handleList = async ({ $ }) =>
 
     //add next page to requestQueue, if exists
     // TODO - loaded dynamically by addinf number to url
-    // const nextLink = $('a.next').attr('href');
+    // const absoluteLink = urlClass.resolve(request.url, aTag.attribs.href);
+    // const urlClass = require('url');
+    // akorát to chce mít to request.url takže tam musí být exports.handleDetail = async ({ request, $ })  např
+    // jako aby se z toho context vzalo ještě request
+    // const nextLink = XXX;
     // if (nextLink)
     // {
     //     await requestQueue.addRequest({
@@ -59,6 +63,16 @@ exports.handleDetail = async ({ request, $ }) => {
     result.currentPrice = parseInt($("span[itemprop='price']").text());
     result.breadcrumb = $('#breadcrumbs').text().trim().split('Heureka.cz » ')[1]
     result.currency = "CZK";
+    if ($("div[class='top-ico gtm-header-link'] span").text() === "Top"){
+        result.inTop = "TRUE";
+    } else (
+        result.inTop = "FALSE"
+    )
+    // to add for every shop listed
+    // result.shop = {};
+    // result.shop.name = ;
+    // result.shop.price = ;
+    // result.shop.numberOfReviews = ;
     
     Apify.pushData(result)
 };
