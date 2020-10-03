@@ -7,8 +7,10 @@ exports.handleStart = async ({ $ }) =>
 {
     const requestQueue = await Apify.openRequestQueue();
     //start page, add all categories links to requestQueue
-    const links = $( "a[data-type='subcategory']" ).map(function ()
-    { return $(this).attr('href'); }).get();
+    //const links = $( "a[data-type='subcategory']" ).map(function ()
+    //{ return $(this).attr('href'); }).get();
+    const links =  $('div.subsec').find('a').map(function () {return $(this).attr('href');}).get()
+    
     for (let link of links)
     {   
         // request is an object, setting url to link and in userdata, setting new dictionary label: LIST
