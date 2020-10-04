@@ -76,7 +76,7 @@ exports.handleDetail = async ({ request, $ }) =>
         result.shop[i].price = $("a.pricen").text();
         result.shop[i].numberOfReviews = parseInt($("a.prov__reviews-link").text());
     }
-    //console.log(result)
+    console.log(result)
 
     // Specification
     // TODO" figure out how to get to the new link and add info to the same dictionary at the same time
@@ -88,8 +88,8 @@ exports.handleDetail = async ({ request, $ }) =>
     // TODO: skip the first row as it is just headline
     for (i = 0; i < paramTableRows.length; i++)
     {
-        result.productSpec[i].name = $("tr span[id*=param-name]").text();
-        result.productSpec[i].value = $("tr span[id*=param-value]").text();
+        result.productSpec[i].name = $("span[id*=param-name]").text();
+        result.productSpec[i].value = $("span[id*=param-value]").text();
     } 
 
     // Recenze
@@ -97,7 +97,15 @@ exports.handleDetail = async ({ request, $ }) =>
     // if I am on reviews link, following info to download
 
     // TODO: what if negative recomm
-    result.recommended = $(".recommendation span").text()
+    result.recommendedNumber = $(".recommendation span").text();
+    result.overallReview = $("div .heureka-rank-wide span.big").text();
+
+    const reviewsTableRows = $(".rating-table tr").get();
+    // result.review[0] = 5 stars, review[1] = 4 stars, ...
+    for (i = 0; i < reviewsTableRows.length; i++)
+    {
+        result.review[i] = $(".percentage").text();
+    } 
 
     Apify.pushData(result)
 };
