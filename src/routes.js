@@ -1,4 +1,5 @@
 const Apify = require('apify');
+const urlClass = require('url');
 
 //const { utils: { log } } = Apify;
 
@@ -23,7 +24,7 @@ exports.handleStart = async ({ $ }) =>
 
 };
 
-exports.handleList = async ({ $ }) =>
+exports.handleList = async ({ request, $ }) =>
 {
     const requestQueue = await Apify.openRequestQueue();
     //add detail pages of all products on the page to requestQueue
@@ -38,23 +39,21 @@ exports.handleList = async ({ $ }) =>
     }
 
     //add next page to requestQueue, if exists
-    // TODO - loaded dynamically by addinf number to url
-    // const absoluteLink = urlClass.resolve(request.url, aTag.attribs.href);
-    // const urlClass = require('url');
-    // akorát to chce mít to request.url takže tam musí být exports.handleDetail = async ({ request, $ })  např
-    // jako aby se z toho context vzalo ještě request
-    // const nextLink = XXX;
-    // if (nextLink)
-    // {
-    //     await requestQueue.addRequest({
-    //         url: nextLink,
-    //         userData: { label: 'LIST' }
-    //     });
-    // }
+    const nextLink = $('a[rel=next]').attr("href");
+        
+    if (nextLink)
+    {
+        const absoluteLink = urlClass.resolve(request.url, nextLink);
+        await requestQueue.addRequest({
+            url: absoluteLink,
+            userData: { label: 'LIST' }
+        });
+    }
     
 };
 
-exports.handleDetail = async ({ request, $ }) => {
+exports.handleDetail = async ({ request, $ }) =>
+{
     //parse detail page
 
     let result = {};
@@ -63,16 +62,42 @@ exports.handleDetail = async ({ request, $ }) => {
     result.currentPrice = parseInt($("span[itemprop='price']").text());
     result.breadcrumb = $('#breadcrumbs').text().trim().split('Heureka.cz » ')[1]
     result.currency = "CZK";
-    if ($("div[class='top-ico gtm-header-link'] span").text() === "Top"){
+    if ($("div[class='top-ico gtm-header-link'] span").text() === "Top")
+    {
         result.inTop = "TRUE";
     } else (
         result.inTop = "FALSE"
     )
-    // to add for every shop listed
-    // result.shop = {};
-    // result.shop.name = ;
-    // result.shop.price = ;
-    // result.shop.numberOfReviews = ;
-    
+
+    const shopsDiv = $('div .shopspr.bottom').children().get()
+    for (i = 0; i < shopsDiv.length; i++)
+    {
+        result.shop[i].name = $("p .shop-name").text();
+        result.shop[i].price = $("a.pricen").text();
+        result.shop[i].numberOfReviews = parseInt($("a.prov__reviews-link").text());
+    }
+    //console.log(result)
+
+    // Specification
+    // TODO" figure out how to get to the new link and add info to the same dictionary at the same time
+    // if I am on specs link, following info to download
+
+    result.productSpec = $("div #full-product-description").text();
+
+    const paramTableRows = $(".product-body__specification__params__table tr").get();
+    // TODO: skip the first row as it is just headline
+    for (i = 0; i < paramTableRows.length; i++)
+    {
+        result.productSpec[i].name = $("tr span[id*=param-name]").text();
+        result.productSpec[i].value = $("tr span[id*=param-value]").text();
+    } 
+
+    // Recenze
+    // TODO" figure out how to get to the new link and add info to the same dictionary at the same time
+    // if I am on reviews link, following info to download
+
+    // TODO: what if negative recomm
+    result.recommended = $(".recommendation span").text()
+
     Apify.pushData(result)
 };
