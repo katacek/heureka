@@ -10,7 +10,7 @@ Apify.main(async () => {
     const requestQueue = await Apify.openRequestQueue();
     await requestQueue.addRequest(
         {
-            url: "https://pletova-kosmetika.heureka.cz/",
+            url: "https://apify.com/",
             "headers": {
             "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
             "accept-language": "en-GB,en;q=0.9",
@@ -24,40 +24,6 @@ Apify.main(async () => {
           "method": "GET",
           "mode": "cors"
                 });
-
-        await requestQueue.addRequest(
-            {
-                url: "https://telova-kosmetika.heureka.cz/",
-                "headers": {
-                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "accept-language": "en-GB,en;q=0.9",
-                "sec-fetch-dest": "document",
-                "sec-fetch-mode": "navigate",
-                "sec-fetch-site": "none",
-                "upgrade-insecure-requests": "1"
-                            },
-                "referrerPolicy": "strict-origin-when-cross-origin",
-                "body": null,
-                "method": "GET",
-                "mode": "cors"
-                    });
-
-        await requestQueue.addRequest(
-            {
-                url: "https://slunecni-ochrana.heureka.cz/",
-                "headers": {
-                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "accept-language": "en-GB,en;q=0.9",
-                "sec-fetch-dest": "document",
-                "sec-fetch-mode": "navigate",
-                "sec-fetch-site": "none",
-                "upgrade-insecure-requests": "1"
-                            },
-                "referrerPolicy": "strict-origin-when-cross-origin",
-                "body": null,
-                "method": "GET",
-                "mode": "cors"
-                    });
 
     const crawler = new Apify.CheerioCrawler({
        // requestList,
