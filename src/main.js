@@ -8,7 +8,6 @@ Apify.main(async () => {
 
     //const requestList = await Apify.openRequestList('start-urls', startUrls);
     const requestQueue = await Apify.openRequestQueue();
-    throw Error("hahaha");
     await requestQueue.addRequest(
         {
             url: "https://pletova-kosmetika.heureka.cz/",
@@ -89,6 +88,7 @@ Apify.main(async () => {
                 case 'DETAIL-REVIEW':
                     return handleDetailReview(context);
                 default:
+                    throw Error("hahaha");
                     return handleStart(context);
             }
         },
