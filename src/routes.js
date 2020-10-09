@@ -112,7 +112,20 @@ exports.handleDetail = async ({ request, $ }) =>
             {
                 label: 'DETAIL-SPECIFIKACE',
                 result: result
-            }
+            },
+            headers: {
+                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "accept-language": "en-US,en;q=0.9",
+                "sec-fetch-dest": "document",
+                "sec-fetch-mode": "navigate",
+                "sec-fetch-site": "none",
+                "sec-fetch-user": "?1",
+                "upgrade-insecure-requests": "1"
+            },
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": null,
+            "method": "GET",
+            "mode": "cors",
         });
     
 };
@@ -121,7 +134,12 @@ exports.handleDetailSpecifikace = async ({ request, $ }) =>
 {
     const requestQueue = await Apify.openRequestQueue();
     let result = request.userData.result;
-    result.specifikace = $('div#full-product-description').text();
+    let spec = $('div#full-product-description').text().trim();
+    if (spec){
+        result.specifikace = spec
+    } else {
+        result.specifikace =  $('div .product-body__specification__short-tail-desc__perex').text().trim()
+    }
 
     const paramTableRows = $(".product-body__specification__params__table tr").get();
     result.parametry = [];
@@ -145,7 +163,20 @@ exports.handleDetailSpecifikace = async ({ request, $ }) =>
             {
                 label: 'DETAIL-REVIEW',
                 result: result
-            }
+            },
+            headers: {
+                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "accept-language": "en-US,en;q=0.9",
+                "sec-fetch-dest": "document",
+                "sec-fetch-mode": "navigate",
+                "sec-fetch-site": "none",
+                "sec-fetch-user": "?1",
+                "upgrade-insecure-requests": "1"
+            },
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": null,
+            "method": "GET",
+            "mode": "cors",
         });
     };
 
@@ -160,6 +191,11 @@ exports.handleDetailSpecifikace = async ({ request, $ }) =>
             result.notRecommendedByNumber = $(".no-recommendation span").text();
         }
         result.overallReviewPecentage = parseInt($("div .heureka-rank-wide span.big").text());
+        const overallReview = $(".starsReviews li").text().replace("Zobrazit:", "").split("|").map(x => x.trim());
+        result.overallReviewNumber = {}
+        overallReview.forEach(x => 
+            result.overallReviewNumber[x.split(" ")[0]] = parseInt(x.split("(")[1])
+            );
     
         const reviewTableRows = $(".rating-table tr").get();
         result.reviewStars = {};
