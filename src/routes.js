@@ -12,6 +12,7 @@ exports.handleStart = async ({ $ }) =>
     //{ return $(this).attr('href'); }).get();
     const links = $('div#box-categories').find('li').map(function ()
     { return $(this).find('a').attr('href'); }).get();
+    console.log(links);
     let count = 0;
     for (let link of links)
     {   
