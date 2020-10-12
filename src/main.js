@@ -31,6 +31,7 @@ Apify.main(async () => {
     countryCode: 'CZ',
     });
 
+    
     const crawler = new Apify.CheerioCrawler({
        // requestList,
         requestQueue,
@@ -40,11 +41,15 @@ Apify.main(async () => {
         //persistCookiesPerSession: true,
         // Be nice to the websites.
         // Remove to unleash full power.
-        maxConcurrency:10,
+        //maxConcurrency:10,
         handlePageTimeoutSecs:60000,
        
        // context is made up by crawler, it contains $, page body, request url, response and session
-        handlePageFunction: async (context) => {
+        handlePageFunction: async (context) =>
+        {
+            //no cars please
+            if (context.request.url.includes('auta.heureka.cz')) return;
+            
             // from context.request get url and put it to const url (alias url = context.request.url)
             // moreover, get userdata, and from them get label and put it to label 
             // alias (label = context.request.userData.label)
@@ -59,6 +64,8 @@ Apify.main(async () => {
                 case 'DETAIL-SPECIFIKACE':
                     return handleDetailSpecifikace(context);
                 case 'DETAIL-REVIEW':
+                    return handleDetailReview(context);
+                case 'DETAIL-REVIEW-NEXT-PAGE':
                     return handleDetailReview(context);
                 default:
                     return handleStart(context);
