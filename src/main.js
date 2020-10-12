@@ -11,6 +11,18 @@ Apify.main(async () => {
     await requestQueue.addRequest(
         {
             url: "https://pletova-kosmetika.heureka.cz/",
+           
+                });
+    
+    await requestQueue.addRequest(
+        {
+            url: "https://slunecni-ochrana.heureka.cz/ ",
+            
+                });
+    
+    await requestQueue.addRequest(
+        {
+            url: "https://telova-kosmetika.heureka.cz/",
             
                 });
     
