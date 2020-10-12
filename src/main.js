@@ -17,12 +17,12 @@ Apify.main(async () => {
     const crawler = new Apify.CheerioCrawler({
        // requestList,
         requestQueue,
-        //useApifyProxy: true,
+        useApifyProxy: true,
         useSessionPool: false,
         //persistCookiesPerSession: true,
         // Be nice to the websites.
         // Remove to unleash full power.
-        maxConcurrency:1,
+        maxConcurrency:10,
         handlePageTimeoutSecs:60000,
        
        // context is made up by crawler, it contains $, page body, request url, response and session
