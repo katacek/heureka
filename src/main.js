@@ -13,11 +13,17 @@ Apify.main(async () => {
             url: "https://pletova-kosmetika.heureka.cz/",
             
                 });
+    
+    const proxyConfiguration = await Apify.createProxyConfiguration({
+    groups: ['CZECH_LUMINATI'] // List of Apify Proxy groups
+    countryCode: 'CZ',
+    });
 
     const crawler = new Apify.CheerioCrawler({
        // requestList,
         requestQueue,
         useApifyProxy: true,
+        proxyConfiguration,
         useSessionPool: false,
         //persistCookiesPerSession: true,
         // Be nice to the websites.
