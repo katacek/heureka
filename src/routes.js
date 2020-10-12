@@ -184,7 +184,7 @@ exports.handleDetailSpecifikace = async ({ request, $ }) =>
                 
         }
         
-        const dataset = await Apify.openDataset("Heureka-TEST_NEW")
+        const dataset = await Apify.openDataset("Heureka-NEW")
 
         await dataset.pushData(result)
 };
