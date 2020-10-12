@@ -16,7 +16,7 @@ exports.handleStart = async ({ $ }) =>
         requestQueue,
         baseUrl:'https://heureka.cz',
         //selector: 'a[href*=https]',
-        pseudoUrls: [pseudoUrl],
+        //pseudoUrls: [pseudoUrl],
         userData:{label:'LIST'}
     });
 };
