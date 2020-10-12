@@ -43,7 +43,6 @@ Apify.main(async () => {
                 case 'DETAIL-REVIEW':
                     return handleDetailReview(context);
                 default:
-                    throw Error("hahaha");
                     return handleStart(context);
             }
         },
