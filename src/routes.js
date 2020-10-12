@@ -6,13 +6,8 @@ const { utils: { log } } = Apify;
 // at this point, the main page is already loaded in $
 exports.handleStart = async ({ $ }) =>
 {
-    log.info("I am here!!")
-    //log.info($.html())
     const requestQueue = await Apify.openRequestQueue();
-
     const pseudoUrl = new Apify.PseudoUrl('[.*]\.heureka.cz/');
-
-    const match = pseudoUrl.matches('https://ochrana-pleti-v-zime.heureka.cz/');
     await Apify.utils.enqueueLinks({
         $,
         requestQueue,
@@ -25,7 +20,7 @@ exports.handleStart = async ({ $ }) =>
 
 exports.handleList = async ({ request, $ }) =>
 {
-   const requestQueue = await Apify.openRequestQueue();
+    const requestQueue = await Apify.openRequestQueue();
     let regexp = request.url.replace('https:', '[(https:)?]');
     regexp += '[[^/^:]+]/';
     let pseudoUrl = new Apify.PseudoUrl(regexp);
@@ -38,16 +33,17 @@ exports.handleList = async ({ request, $ }) =>
     });
 
     //enqueue pagination links
-    regexp = request.url + '\?f=[\\d+]';
+    let baseUrl = request.url.replace(/\?f=\d+/, '');
+    regexp = baseUrl + '\?f=[\\d+]';
     pseudoUrl = new Apify.PseudoUrl(regexp);
+    
     await Apify.utils.enqueueLinks({
         $,
         requestQueue,
-        baseUrl:request.url,
+        baseUrl: baseUrl,
         pseudoUrls: [pseudoUrl],
         userData:{label:'LIST'}
     });
-    
 };
 
 
