@@ -155,7 +155,10 @@ exports.handleDetailSpecifikace = async ({ request, $ }) =>
         }
          //reviews
         const reviewDivs = $('div.review');
-        result.reviews = [];
+        if (result.reviews == undefined)
+        {
+            result.reviews = [];
+        }
        
         for (i = 0; i < reviewDivs.length; i++)
         {
