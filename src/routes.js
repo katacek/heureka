@@ -7,7 +7,7 @@ const { utils: { log } } = Apify;
 exports.handleStart = async ({ $ }) =>
 {
     log.info("I am here!!")
-    log.info($.html())
+    //log.info($.html())
     const requestQueue = await Apify.openRequestQueue();
 
     const pseudoUrl = new Apify.PseudoUrl('[.*]\.heureka.cz/');
