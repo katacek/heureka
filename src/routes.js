@@ -6,7 +6,6 @@ const { utils: { log } } = Apify;
 // at this point, the main page is already loaded in $
 exports.handleStart = async ({ $ }) =>
 {
-    log.info($.html());
     const requestQueue = await Apify.openRequestQueue();
     const pseudoUrl = new Apify.PseudoUrl('[.*]\.heureka.cz/');
     await Apify.utils.enqueueLinks({
