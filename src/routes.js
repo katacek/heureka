@@ -7,10 +7,7 @@ const urlClass = require('url');
 exports.handleStart = async ({ $ }) =>
 {
     const requestQueue = await Apify.openRequestQueue();
-
     const pseudoUrl = new Apify.PseudoUrl('[.*]\.heureka.cz/');
-
-    const match = pseudoUrl.matches('https://ochrana-pleti-v-zime.heureka.cz/');
     await Apify.utils.enqueueLinks({
         $,
         requestQueue,
@@ -18,9 +15,7 @@ exports.handleStart = async ({ $ }) =>
         //selector: 'a[href*=https]',
         pseudoUrls: [pseudoUrl],
         userData:{label:'LIST'}
-    });
-
-    console.log(requestQueue);
+    });    
 };
 
 exports.handleList = async ({ request, $ }) =>
