@@ -1,11 +1,13 @@
 const Apify = require('apify');
 const urlClass = require('url');
 
-//const { utils: { log } } = Apify;
+const { utils: { log } } = Apify;
 
 // at this point, the main page is already loaded in $
 exports.handleStart = async ({ $ }) =>
 {
+    log.info("I am here!!")
+    log.info($.html())
     const requestQueue = await Apify.openRequestQueue();
 
     const pseudoUrl = new Apify.PseudoUrl('[.*]\.heureka.cz/');
