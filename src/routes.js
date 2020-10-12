@@ -19,10 +19,6 @@ exports.handleStart = async ({ $ }) =>
         pseudoUrls: [pseudoUrl],
         userData:{label:'LIST'}
     });
-
-    console.log(requestQueue);
-    }
-
 };
 
 exports.handleList = async ({ request, $ }) =>
