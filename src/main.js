@@ -15,8 +15,8 @@ Apify.main(async () => {
                 });
     
     const proxyConfiguration = await Apify.createProxyConfiguration({
-    groups: ['CZECH_LUMINATI'] // List of Apify Proxy groups
-    countryCode: 'CR',
+    groups: ['CZECH_LUMINATI'], // List of Apify Proxy groups
+    countryCode: 'CZ',
     });
 
     const crawler = new Apify.CheerioCrawler({
