@@ -1,13 +1,16 @@
 const Apify = require('apify');
 const urlClass = require('url');
 
-const { utils: { log } } = Apify;
+//const { utils: { log } } = Apify;
 
 // at this point, the main page is already loaded in $
 exports.handleStart = async ({ $ }) =>
 {
     const requestQueue = await Apify.openRequestQueue();
+
     const pseudoUrl = new Apify.PseudoUrl('[.*]\.heureka.cz/');
+
+    const match = pseudoUrl.matches('https://ochrana-pleti-v-zime.heureka.cz/');
     await Apify.utils.enqueueLinks({
         $,
         requestQueue,
@@ -16,24 +19,28 @@ exports.handleStart = async ({ $ }) =>
         pseudoUrls: [pseudoUrl],
         userData:{label:'LIST'}
     });
+
+    console.log(requestQueue);
 };
 
 exports.handleList = async ({ request, $ }) =>
 {
     const requestQueue = await Apify.openRequestQueue();
-    let regexp = request.url.replace('https:', '[(https:)?]');
+    let baseUrl = request.url.replace(/\?f=\d+/, '');
+    let regexp = baseUrl.replace('https:', '[(https:)?]');
+    
     regexp += '[[^/^:]+]/';
     let pseudoUrl = new Apify.PseudoUrl(regexp);
     await Apify.utils.enqueueLinks({
         $,
         requestQueue,
-        baseUrl:request.url,
+        baseUrl:baseUrl,
         pseudoUrls: [pseudoUrl],
         userData:{label:'DETAIL'}
     });
 
     //enqueue pagination links
-    let baseUrl = request.url.replace(/\?f=\d+/, '');
+    baseUrl = request.url.replace(/\?f=\d+/, '');
     regexp = baseUrl + '\?f=[\\d+]';
     pseudoUrl = new Apify.PseudoUrl(regexp);
     
@@ -85,20 +92,7 @@ exports.handleDetail = async ({ request, $ }) =>
             {
                 label: 'DETAIL-SPECIFIKACE',
                 result: result
-            },
-            headers: {
-                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "accept-language": "en-US,en;q=0.9",
-                "sec-fetch-dest": "document",
-                "sec-fetch-mode": "navigate",
-                "sec-fetch-site": "none",
-                "sec-fetch-user": "?1",
-                "upgrade-insecure-requests": "1"
-            },
-            "referrerPolicy": "strict-origin-when-cross-origin",
-            "body": null,
-            "method": "GET",
-            "mode": "cors",
+            }
         });
     
 };
@@ -107,12 +101,7 @@ exports.handleDetailSpecifikace = async ({ request, $ }) =>
 {
     const requestQueue = await Apify.openRequestQueue();
     let result = request.userData.result;
-    let spec = $('div#full-product-description').text().trim();
-    if (spec){
-        result.specifikace = spec
-    } else {
-        result.specifikace =  $('div .product-body__specification__short-tail-desc__perex').text().trim()
-    }
+    result.specifikace = $('div#full-product-description').text();
 
     const paramTableRows = $(".product-body__specification__params__table tr").get();
     result.parametry = [];
@@ -136,20 +125,7 @@ exports.handleDetailSpecifikace = async ({ request, $ }) =>
             {
                 label: 'DETAIL-REVIEW',
                 result: result
-            },
-            headers: {
-                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-                "accept-language": "en-US,en;q=0.9",
-                "sec-fetch-dest": "document",
-                "sec-fetch-mode": "navigate",
-                "sec-fetch-site": "none",
-                "sec-fetch-user": "?1",
-                "upgrade-insecure-requests": "1"
-            },
-            "referrerPolicy": "strict-origin-when-cross-origin",
-            "body": null,
-            "method": "GET",
-            "mode": "cors",
+            }
         });
     };
 
@@ -157,34 +133,54 @@ exports.handleDetailSpecifikace = async ({ request, $ }) =>
     exports.handleDetailReview = async ({ request, $ }) =>
     {
         const requestQueue = await Apify.openRequestQueue();
-        let result = request.userData.result;
-        result.recommendedByNumber = $(".recommendation span").text();
-        const notRecommended = $(".no-recommendation span").text();
-        if (notRecommended) {
-            result.notRecommendedByNumber = $(".no-recommendation span").text();
-        }
-        result.overallReviewPecentage = parseInt($("div .heureka-rank-wide span.big").text());
-        const overallReview = $(".starsReviews li").text().replace("Zobrazit:", "").split("|").map(x => x.trim());
-        result.overallReviewNumber = {}
-        overallReview.forEach(x => 
-            result.overallReviewNumber[x.split(" ")[0]] = parseInt(x.split("(")[1])
-            );
-    
-        const reviewTableRows = $(".rating-table tr").get();
-        result.reviewStars = {};
-        
-        for (i = 0; i < reviewTableRows.length; i++)
+        result = request.userData.result;
+
+        if (request.userData.label === 'DETAIL-REVIEW')
         {
-            let percentage = parseInt($(".percentage", reviewTableRows[i]).text());
-            result.reviewStars[5-i] = percentage;
-                
-        }
-        
-        const dataset = await Apify.openDataset("Heureka-NEW")
-
-        await dataset.pushData(result)
-};
-
-
-
+            const requestQueue = await Apify.openRequestQueue();
+            let result = request.userData.result;
+            result.recommendedByNumber = $(".recommendation span").text();
+            const notRecommended = $(".no-recommendation span").text();
+            if (notRecommended)
+            {
+                result.notRecommendedByNumber = $(".no-recommendation span").text();
+            }
+            result.overallReviewPecentage = parseInt($("div .heureka-rank-wide span.big").text());
     
+            const reviewTableRows = $(".rating-table tr").get();
+            result.reviewStars = {};
+        
+            for (i = 0; i < reviewTableRows.length; i++)
+            {
+                let percentage = parseInt($(".percentage", reviewTableRows[i]).text());
+                result.reviewStars[5 - i] = percentage;
+                
+            }
+        }
+         //reviews
+        const reviewDivs = $('div.review');
+        result.reviews = [];
+       
+        for (i = 0; i < reviewDivs.length; i++)
+        {
+            let review = {};
+
+            review.percentage = parseInt($('.eval', reviewDivs[i]).text());
+            review.text = $('.revtext p',reviewDivs[i]).text();
+            review.plusText = $('div.plus li',reviewDivs[i]).map(function () { return $(this).text(); }).get();
+            review.minusText = $('div.minus li',reviewDivs[i]).map(function () { return $(this).text(); }).get();
+            result.reviews.push(review);
+        }
+
+        const nextLink = $('a.next').attr('href');
+        if (nextLink)
+        {
+            const baseUrl = request.url.replace(/\?f=\d+/, '');
+            const nextUrl = urlClass.resolve(baseUrl, nextLink);
+            requestQueue.addRequest({ url: nextUrl, userData: { label: 'DETAIL-REVIEW-NEXTPAGE', result : result } });
+        }
+        else
+        {
+            await Apify.pushData(result)
+        }
+};
