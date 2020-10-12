@@ -185,8 +185,10 @@ exports.handleDetailSpecifikace = async ({ request, $ }) =>
             result.reviewStars[5-i] = percentage;
                 
         }
+        
+        const dataset = await Apify.openDataset("Heureka-TEST_NEW")
 
-        await Apify.pushData(result)
+        await dataset.pushData(result)
 };
 
 
