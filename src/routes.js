@@ -55,7 +55,8 @@ exports.handleList = async ({ request, $ }) =>
     }
 
     //add next page to requestQueue
-    const nextLink = $('a.next').attr('href');
+    let nextLink = $('a.next').attr('href');
+    if (!nextLink) nextLink = $('.c-pagination__button').attr('href');
     if (nextLink)
     {
         const baseUrl = request.url.replace(/\?f=\d+/, '');
