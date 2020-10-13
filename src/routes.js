@@ -4,49 +4,65 @@ const urlClass = require('url');
 const { utils: { log } } = Apify;
 
 // at this point, the main page is already loaded in $
-exports.handleStart = async ({ $ }) =>
+exports.handleStart = async ({ $, request }) =>
 {
-    log.info($.html());
     const requestQueue = await Apify.openRequestQueue();
-    const pseudoUrl = new Apify.PseudoUrl('[.*]\.heureka.cz/');
-    await Apify.utils.enqueueLinks({
-        $,
-        requestQueue,
-        baseUrl:'https://heureka.cz',
-        //selector: 'a[href*=https]',
-        pseudoUrls: [pseudoUrl],
-        userData:{label:'LIST'}
-    });    
+    //start page, add all categories links to requestQueue
+    //const links = $( "a[data-type='subcategory']" ).map(function ()
+    //{ return $(this).attr('href'); }).get();
+    const links = $('div#box-categories').find('li').find('h2').map(function ()
+    { return $(this).find('a').attr('href'); }).get();
+    
+    for (let link of links)
+    {   
+        // request is an object, setting url to link and in userdata, setting new dictionary label: LIST
+        // it is me who is setting the label value, just using it for making the crawler fcn more clear
+         await requestQueue.addRequest({
+            url: link,
+             userData: { label: 'LIST' },
+        });
+    }
+
 };
 
 exports.handleList = async ({ request, $ }) =>
 {
     const requestQueue = await Apify.openRequestQueue();
-    let baseUrl = request.url.replace(/\?f=\d+/, '');
-    let regexp = baseUrl.replace('https:', '[(https:)?]');
+    //add detail pages of all products on the page to requestQueue
+    const links = $( ".product-container" ).map(function ()
+    { return $(this).find('a').attr('href'); }).get();
     
-    regexp += '[[^/^:]+]/';
-    let pseudoUrl = new Apify.PseudoUrl(regexp);
-    await Apify.utils.enqueueLinks({
-        $,
-        requestQueue,
-        baseUrl:baseUrl,
-        pseudoUrls: [pseudoUrl],
-        userData:{label:'DETAIL'}
-    });
+    for (let link of links)
+    {
+        const absoluteLink = urlClass.resolve(request.url, link);
+        await requestQueue.addRequest({
+            url: absoluteLink,
+            userData: { label: 'DETAIL' },
+            headers: {
+                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                "accept-language": "en-US,en;q=0.9",
+                "sec-fetch-dest": "document",
+                "sec-fetch-mode": "navigate",
+                "sec-fetch-site": "none",
+                "sec-fetch-user": "?1",
+                "upgrade-insecure-requests": "1"
+            },
+            "referrerPolicy": "strict-origin-when-cross-origin",
+            "body": null,
+            "method": "GET",
+            "mode": "cors",
+        });
+    }
 
-    //enqueue pagination links
-    baseUrl = request.url.replace(/\?f=\d+/, '');
-    regexp = baseUrl + '\?f=[\\d+]';
-    pseudoUrl = new Apify.PseudoUrl(regexp);
-    
-    await Apify.utils.enqueueLinks({
-        $,
-        requestQueue,
-        baseUrl: baseUrl,
-        pseudoUrls: [pseudoUrl],
-        userData:{label:'LIST'}
-    });
+    //add next page to requestQueue
+    const nextLink = $('a.next').attr('href');
+    if (nextLink)
+    {
+        const baseUrl = request.url.replace(/\?f=\d+/, '');
+        const nextUrl = urlClass.resolve(baseUrl, nextLink);
+        requestQueue.addRequest({ url: nextUrl, userData: { label: 'LIST' } });
+    }
+
 };
 
 
