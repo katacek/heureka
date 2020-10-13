@@ -64,7 +64,7 @@ exports.handleList = async ({ request, $ }) =>
     }
     else
     {
-        log.info(request.url + ' finish!!'
+        log.info(request.url + ' finish!!');
     }
 
 };
