@@ -7,7 +7,6 @@ const { utils: { log } } = Apify;
 exports.handleStart = async ({ $, request }) =>
 {
     const requestQueue = await Apify.openRequestQueue();
-    log.info($.html());
     //start page, add all categories links to requestQueue
     //const links = $( "a[data-type='subcategory']" ).map(function ()
     //{ return $(this).attr('href'); }).get();
@@ -62,6 +61,10 @@ exports.handleList = async ({ request, $ }) =>
         const baseUrl = request.url.replace(/\?f=\d+/, '');
         const nextUrl = urlClass.resolve(baseUrl, nextLink);
         requestQueue.addRequest({ url: nextUrl, userData: { label: 'LIST' } });
+    }
+    else
+    {
+        log.info(request.url + ' finish!!'
     }
 
 };
