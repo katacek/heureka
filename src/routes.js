@@ -78,7 +78,12 @@ exports.handleDetail = async ({ request, $ }) =>
     let result = {};
     result.itemUrl = request.url;
     result.itemName = $("h1[itemprop='name']").text().trim();
-    result.currentPrice = parseInt($("span[itemprop='price']").text());
+    result.currentPrice = parseInt($("span[itemprop='price']").text().replace(' ',''));
+
+    if(!result.itemName || !result.currentPrice)
+    {
+        await Apify.SetValue('HeurekaBadPage', $.html());
+    }
     result.breadcrumb = $('#breadcrumbs').text().trim().split('Heureka.cz » ')[1]
     result.currency = "CZK";
     if ($("div[class='top-ico gtm-header-link'] span").text() === "Top")
