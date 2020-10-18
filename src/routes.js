@@ -86,8 +86,9 @@ exports.handleDetail = async ({ request, $ }) =>
    
     if(!result.currentPrice)
     {
-        const price = $('meta[name="gtm:ecommerce:detail:products"]').attr('content').split('&quot;priceMin&quot;: ');
+        const price = $('meta[name="gtm:ecommerce:detail:products"]').attr('content').split('&quot;priceMin&quot;: ')[1];
         if(price)
+        console.log(price)
         {
             result.currentPrice = parseInt(price.replace(' ',''));
         }
