@@ -84,9 +84,9 @@ exports.handleDetail = async ({ request, $ }) =>
     result.currentPrice = parseInt($("span[itemprop='price']").text().replace(' ',''));
 
    
-    if(!result.currentPrice)
+      if(!result.currentPrice)
     {
-        const price = $('meta[name="gtm:ecommerce:detail:products"]').attr('content').split('&quot;priceMin&quot;: ')[1];
+        const price = $('meta[name="gtm:ecommerce:detail:products"]').attr('content').split('priceMin: ')[1];
         if(price)
         {
             console.log(price)
@@ -97,7 +97,9 @@ exports.handleDetail = async ({ request, $ }) =>
 
     if(!result.itemName || !result.currentPrice || result.currentPrice == NaN)
     {
-        await Apify.setValue('HeurekaBadPage', {itemName: result.itemName,price: result.currentPrice,
+        await Apify.setValue('HeurekaBadPage', 
+            {itemName: result.itemName,
+            price: result.currentPrice,
             tag: $('meta[name="gtm:ecommerce:detail:products"]').attr('content'),
             pageSource: $.html()});
         
