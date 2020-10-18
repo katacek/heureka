@@ -94,8 +94,8 @@ exports.handleDetail = async ({ request, $ }) =>
     if(!result.itemName || !result.currentPrice || result.currentPrice == NaN)
     {
         await Apify.setValue('HeurekaBadPage', $.html());
-        await Apify.setValue('HeurekaBadPage', result.itemName);
-        await Apify.setValue('HeurekaBadPage', result.currentPrice);
+        await Apify.setValue('HeurekaBadPageItemName', result.itemName);
+        await Apify.setValue('HeurekaBadPagePrice', result.currentPrice);
 
     }
     result.breadcrumb = $('#breadcrumbs').text().trim().split('Heureka.cz » ')[1]
