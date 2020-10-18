@@ -82,7 +82,7 @@ exports.handleDetail = async ({ request, $ }) =>
 
     if(!result.itemName || !result.currentPrice)
     {
-        await Apify.SetValue('HeurekaBadPage', $.html());
+        await Apify.setValue('HeurekaBadPage', $.html());
     }
     result.breadcrumb = $('#breadcrumbs').text().trim().split('Heureka.cz » ')[1]
     result.currency = "CZK";
