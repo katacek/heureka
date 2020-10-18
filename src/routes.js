@@ -73,16 +73,30 @@ exports.handleList = async ({ request, $ }) =>
 
 exports.handleDetail = async ({ request, $ }) =>
 {
-    const requestQueue = await Apify.openRequestQueue();
+   const requestQueue = await Apify.openRequestQueue();
     //parse detail page
     let result = {};
     result.itemUrl = request.url;
     result.itemName = $("h1[itemprop='name']").text().trim();
+    if(!result.itemName)
+    {
+        result.itemName = $("h1.c-product-info__name").text().trim();
+    }
+
     result.currentPrice = parseInt($("span[itemprop='price']").text().replace(' ',''));
 
-    if(!result.itemName || !result.currentPrice)
+    if(!result.currentPrice)
+    {
+        result.currentPrice = parseInt($(".c-product__price").text().replace(' ',''));
+    }
+
+
+    if(!result.itemName || !result.currentPrice || result.currentPrice == NaN)
     {
         await Apify.setValue('HeurekaBadPage', $.html());
+        await Apify.setValue('HeurekaBadPage', result.itemName);
+        await Apify.setValue('HeurekaBadPage', result.currentPrice);
+
     }
     result.breadcrumb = $('#breadcrumbs').text().trim().split('Heureka.cz » ')[1]
     result.currency = "CZK";
