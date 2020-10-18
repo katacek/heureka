@@ -84,26 +84,17 @@ exports.handleDetail = async ({ request, $ }) =>
     result.currentPrice = parseInt($("span[itemprop='price']").text().replace(' ',''));
 
    
-      if(!result.currentPrice)
+     if(!result.currentPrice)
     {
         const price = $('meta[name="gtm:ecommerce:detail:products"]').attr('content').split('\"priceMin\": ')[1];
         if(price)
         {
             console.log(price)
             result.currentPrice = parseInt(price.replace(' ',''));
+            result.currentPriceNote = "Price from metadata - lowest"
         }
     }
-
-
-    if(!result.itemName || !result.currentPrice || result.currentPrice == NaN)
-    {
-        await Apify.setValue('HeurekaBadPage', 
-            {itemName: result.itemName,
-            price: result.currentPrice,
-            tag: $('meta[name="gtm:ecommerce:detail:products"]').attr('content'),
-            pageSource: $.html()});
-        
-    }
+    
     result.breadcrumb = $('#breadcrumbs').text().trim().split('Heureka.cz » ')[1]
     result.currency = "CZK";
     if ($("div[class='top-ico gtm-header-link'] span").text() === "Top")
