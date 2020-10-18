@@ -86,7 +86,7 @@ exports.handleDetail = async ({ request, $ }) =>
    
       if(!result.currentPrice)
     {
-        const price = $('meta[name="gtm:ecommerce:detail:products"]').attr('content').split('priceMin: ')[1];
+        const price = $('meta[name="gtm:ecommerce:detail:products"]').attr('content').split('\"priceMin\": ')[1];
         if(price)
         {
             console.log(price)
