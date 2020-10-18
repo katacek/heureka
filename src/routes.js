@@ -87,8 +87,9 @@ exports.handleDetail = async ({ request, $ }) =>
 
     if(!result.currentPrice)
     {
-        result.currentPrice = parseInt($(".c-product__price").text().replace(' ',''));
+        result.currentPrice = parseInt($('meta[name="gam:target:price"]').attr('content').replace(' ',''));
     }
+
 
 
     if(!result.itemName || !result.currentPrice || result.currentPrice == NaN)
