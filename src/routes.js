@@ -115,7 +115,7 @@ exports.handleDetail = async ({ request, $ }) =>
         result.shop[i].numberOfReviews = parseInt($('a.prov__reviews-link', shopsDiv[i]).text());
     }
 
-    const specUrl = request.url + 'specifikace/';
+    const specUrl = request.url.split('?')[0] + 'specifikace/';
 
     //new request for specification page
     requestQueue.addRequest(
